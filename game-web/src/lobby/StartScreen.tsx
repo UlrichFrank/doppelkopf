@@ -3,6 +3,7 @@ import { PERSONAS, ROUND_CHOICES, personaName } from "shared";
 import type { NpcPersona } from "shared";
 import { SuitShape } from "../cards/Card";
 import { listOpenMatches, npcSeats, type MatchInfo } from "./api";
+import { SpielothekLink } from "./SpielothekLink";
 
 export type SeatChoice = "mensch" | NpcPersona;
 
@@ -63,6 +64,9 @@ export function StartScreen(props: Props) {
     <main className="mx-auto flex min-h-full max-w-5xl flex-col gap-8 px-4 pb-10 pt-[max(2rem,env(safe-area-inset-top))] sm:px-8">
       <header className="flex items-end justify-between gap-4">
         <div>
+          <div className="mb-4">
+            <SpielothekLink game="doppelkopf" />
+          </div>
           <h1 className="text-5xl font-extrabold leading-none tracking-tight text-chalk sm:text-7xl">Doppelkopf</h1>
           <p className="mt-2 text-lg text-chalk/70">Zu viert am Tisch – mit Freunden oder gegen den Computer.</p>
         </div>

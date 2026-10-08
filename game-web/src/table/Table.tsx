@@ -92,6 +92,9 @@ export function Table({ view, me, moves, onLeave, onPause }: Props) {
               <button onClick={onPause} className="rounded-lg px-3 py-2 text-left hover:bg-wood-800">
                 Zur Lobby (Platz behalten)
               </button>
+              <a href="https://apps.diefranks.eu/#doppelkopf" className="rounded-lg px-3 py-2 text-left hover:bg-wood-800">
+                Zur Spielothek (Platz behalten)
+              </a>
               <button
                 onClick={() => {
                   if (window.confirm("Tisch wirklich verlassen? Du kannst danach nicht zurück.")) onLeave();
