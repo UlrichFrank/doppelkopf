@@ -1,0 +1,24 @@
+# Traefik dynamic configuration (file provider) for Doppelkopf.
+# Installed to ~/deploy/traefik/dynamic/doppelkopf.yml by `make deploy`;
+# Traefik picks up changes without a restart (providers.file.watch).
+#
+# Uses the existing wildcard certificate *.apps.diefranks.eu of the
+# "letsencrypt" resolver — no new certificate is requested.
+http:
+  routers:
+    doppelkopf:
+      rule: "Host(`doppelkopf.apps.diefranks.eu`)"
+      entryPoints:
+        - websecure
+      service: doppelkopf
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: "*.apps.diefranks.eu"
+
+  services:
+    doppelkopf:
+      loadBalancer:
+        servers:
+          # Gateway of the Docker network "web" = host, where the binary listens
+          - url: "http://172.18.0.1:3003"

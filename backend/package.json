@@ -1,0 +1,21 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "boardgame.io server and NPC players for Doppelkopf",
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "start": "bun src/server.ts",
+    "type-check": "tsc --noEmit",
+    "simulate": "bun src/simulation/run.ts",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "boardgame.io": "^0.50.2",
+    "shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3"
+  }
+}

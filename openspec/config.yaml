@@ -1,0 +1,40 @@
+schema: spec-driven
+
+context: |
+  Doppelkopf als Multiplayer-Webspiel (Schwesterprojekt von ~/dev/Ausgebremst und
+  ~/dev/portale-von-molthar). Tech: Bun-Workspaces (shared, backend, game-web),
+  TypeScript strict, boardgame.io 0.50 (Server + Socket.IO), React 19 + Vite + Tailwind 4.
+  Produktion: Single Binary (bun build --compile) als systemd-Dienst hinter Traefik
+  auf dem vServer, Domain doppelkopf.apps.diefranks.eu, Port 3003 auf 172.18.0.1.
+  Specs und Texte auf Deutsch. Tests mit bun test.
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+# Example:
+#   context: |
+#     Tech stack: TypeScript, React, Node.js
+#     We use conventional commits
+#     Domain: e-commerce platform
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

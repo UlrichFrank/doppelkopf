@@ -1,0 +1,96 @@
+@import "tailwindcss";
+@import "@fontsource/alegreya-sans/latin-400.css";
+@import "@fontsource/alegreya-sans/latin-500.css";
+@import "@fontsource/alegreya-sans/latin-700.css";
+@import "@fontsource/alegreya-sans/latin-800.css";
+@import "@fontsource/kalam/latin-400.css";
+@import "@fontsource/kalam/latin-700.css";
+
+/*
+ * Kneipentisch: dark oiled walnut, cream playing cards in classic red/black,
+ * scores pencilled on a Bierdeckel. Re is the gold of a fresh Pils, Kontra
+ * the steel blue of the coaster print.
+ */
+@theme {
+  --font-sans: "Alegreya Sans", system-ui, sans-serif;
+  --font-hand: "Kalam", "Comic Sans MS", cursive;
+
+  --color-wood-950: #1e140e;
+  --color-wood-900: #2b1d15;
+  --color-wood-800: #3b291e;
+  --color-wood-700: #4f3727;
+  --color-wood-500: #8a6a4f;
+  --color-paper: #fbf8f1;
+  --color-paper-dim: #efe8d8;
+  --color-ink: #1d1a17;
+  --color-card-red: #c8102e;
+  --color-coaster: #ebdfc4;
+  --color-coaster-ring: #a8322d;
+  --color-pencil: #3a3a40;
+  --color-re: #e2b23c;
+  --color-kontra: #8fb3d6;
+  --color-chalk: #f3ead9;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-chalk);
+  background-color: var(--color-wood-900);
+  /* Walnut grain: long soft stripes plus a vignette */
+  background-image:
+    radial-gradient(ellipse at 50% 40%, rgb(255 220 180 / 0.07), transparent 65%),
+    repeating-linear-gradient(
+      97deg,
+      rgb(0 0 0 / 0.08) 0 2px,
+      transparent 2px 9px,
+      rgb(255 255 255 / 0.025) 9px 11px,
+      transparent 11px 23px
+    ),
+    linear-gradient(180deg, var(--color-wood-800), var(--color-wood-950));
+  background-attachment: fixed;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-re);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes card-in {
+  from {
+    transform: translate(var(--from-x, 0), var(--from-y, 40px)) scale(0.9);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-ring {
+  50% {
+    box-shadow: 0 0 0 4px rgb(226 178 60 / 0.35);
+  }
+}

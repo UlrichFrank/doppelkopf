@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Full-bleed walnut background (maskable: keep the motif inside the central 80%) -->
+  <defs>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a3324"/>
+      <stop offset="1" stop-color="#22170f"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#wood)"/>
+  <!-- Back card: Kreuz-Dame -->
+  <g transform="rotate(-12 256 270)">
+    <rect x="150" y="128" width="168" height="252" rx="16" fill="#efe8d8" stroke="#1d1a17" stroke-opacity="0.35" stroke-width="3"/>
+    <g fill="#1d1a17" transform="translate(186 190) scale(0.9)">
+      <circle cx="50" cy="27" r="21"/><circle cx="25" cy="58" r="21"/><circle cx="75" cy="58" r="21"/>
+      <path d="M45 50c0 22-5 36-14 48h38c-9-12-14-26-14-48z"/>
+    </g>
+  </g>
+  <!-- Front card: Herz-Zehn (Dulle) -->
+  <g transform="rotate(10 256 270)">
+    <rect x="200" y="140" width="168" height="252" rx="16" fill="#fbf8f1" stroke="#1d1a17" stroke-opacity="0.35" stroke-width="3"/>
+    <g fill="#c8102e" transform="translate(229 210) scale(1.1)">
+      <path d="M50 92C22 68 3 48 3 29 3 13 15 3 28 3c10 0 18 6 22 15C54 9 62 3 72 3c13 0 25 10 25 26 0 19-19 39-47 63z"/>
+    </g>
+  </g>
+</svg>

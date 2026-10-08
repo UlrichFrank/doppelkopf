@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
+
+# Persisted matches and NPC credentials (backend, development)
+backend/.data/
+
+# Generated asset manifest for the single binary (backend/scripts/gen-assets.ts)
+backend/src/embedded/assets.gen.ts

@@ -1,0 +1,14 @@
+{
+  "name": "doppelkopf",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "backend",
+    "game-web"
+  ],
+  "scripts": {
+    "dev": "make dev",
+    "test": "make test"
+  }
+}
