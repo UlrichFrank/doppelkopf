@@ -88,6 +88,11 @@ export interface RoundState {
   hands: Card[][];
   handCounts: number[];
   /**
+   * Red/blue backs per hand — public, like at a real table. Absent in
+   * matches stored before backs were tracked.
+   */
+  handBacks?: Record<"rot" | "blau", number>[];
+  /**
    * Reservations per seat; null = not declared yet. In a player's view,
    * others' reservations other than "gesund" show as "vorbehalt" unless they
    * decided the game type.

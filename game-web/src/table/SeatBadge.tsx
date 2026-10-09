@@ -1,5 +1,4 @@
 import type { DoppelkopfState } from "shared";
-import { backColorForRound } from "../cards/backColor";
 import { OpponentHand } from "./OpponentHand";
 import { partyName, RESERVATION_LABEL, seatAnnouncement } from "./labels";
 
@@ -54,7 +53,7 @@ export function SeatBadge({ G, seat, name, active, connected, hand, compact = fa
           {!connected && <span className="text-chalk/60">offline</span>}
         </div>
       </div>
-      {hand && <OpponentHand count={count} side={hand} color={backColorForRound(r.number)} />}
+      {hand && <OpponentHand count={count} backs={r.handBacks?.[seat] ?? null} side={hand} />}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { createDeck } from "../game/cards";
+import { backsOf, createDeck } from "../game/cards";
 import { initialState } from "../game/round";
 import type { Card, DoppelkopfState, Rank, Suit } from "../game/types";
 
@@ -40,6 +40,7 @@ export function stateWithHands(hands: string[][], withNines = true): DoppelkopfS
   for (const hand of result) while (hand.length < n) hand.push(rest.shift()!);
   G.round.hands = result;
   G.round.handCounts = result.map((h) => h.length);
+  G.round.handBacks = result.map(backsOf);
   return G;
 }
 

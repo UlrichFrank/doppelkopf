@@ -2,11 +2,11 @@
  * Monte-Carlo card choice (perfect-information sampling): the cards the bot
  * cannot see are dealt at random to the other players — consistent with what
  * the bot knows (suits a player failed to follow, Kreuz-Damen of known
- * parties) — and every candidate card is played out to the end of the round
+ * parties, how many red and blue backs every hand shows) — and every candidate card is played out to the end of the round
  * with the heuristic policy for all four seats.
  */
-import { createDeck, effectiveSuit, isKreuzDame, legalCards, playCard } from "shared";
-import type { Card, DoppelkopfState, Party, PlayedCard, Seat } from "shared";
+import { backColor, backsOf, createDeck, effectiveSuit, isKreuzDame, legalCards, playCard } from "shared";
+import type { BackColor, Backs, Card, DoppelkopfState, Party, PlayedCard, Seat } from "shared";
 import { chooseCardHeuristic } from "./heuristic";
 
 export type Rng = () => number;
@@ -56,6 +56,44 @@ function shuffleInPlace<T>(a: T[], rnd: Rng): T[] {
   return a;
 }
 
+/** Colour bucket of a card for dealing: its back colour, or one shared bucket when backs are unknown. */
+const bucket = (card: Card, byBacks: boolean): BackColor => (byBacks ? (backColor(card) ?? "rot") : "rot");
+
+/**
+ * Free places per seat and colour. With `byBacks` the seat takes exactly as
+ * many red and blue cards as its hand shows; otherwise one bucket per seat.
+ */
+function placesFor(seats: Seat[], counts: number[], backs: Backs[] | undefined, byBacks: boolean): Backs[] {
+  return [0, 1, 2, 3].map((s) => {
+    if (!seats.includes(s)) return { rot: 0, blau: 0 };
+    return byBacks ? { ...backs![s] } : { rot: counts[s], blau: 0 };
+  });
+}
+
+/**
+ * Deals `cards` at random to `seats` so that every seat gets as many red and
+ * blue backs as `backs` says (or just `counts` cards when backs are unknown).
+ */
+export function dealByBacks(
+  cards: Card[],
+  seats: Seat[],
+  counts: number[],
+  backs: Backs[] | undefined,
+  rnd: Rng,
+): Card[][] {
+  const byBacks = backs !== undefined && cards.every((c) => backColor(c) !== null);
+  const places = placesFor(seats, counts, backs, byBacks);
+  const hands: Card[][] = [[], [], [], []];
+  for (const card of shuffleInPlace([...cards], rnd)) {
+    const color = bucket(card, byBacks);
+    const open = seats.filter((s) => places[s][color] > 0);
+    const seat = open[Math.floor(rnd() * open.length)];
+    hands[seat].push(card);
+    places[seat][color]--;
+  }
+  return hands;
+}
+
 /**
  * Deals the unknown cards to the other seats. Returns hands for all seats
  * (the bot's own hand unchanged).
@@ -87,35 +125,37 @@ export function sampleHands(view: DoppelkopfState, me: Seat, rnd: Rng): Card[][]
     return !strict || !voids[seat].has(effectiveSuit(card, gt));
   };
 
+  // The backs every player shows are part of the public information
+  const byBacks = round.handBacks !== undefined && unknown.every((c) => backColor(c) !== null);
+
   for (let attempt = 0; attempt < 60; attempt++) {
     const strict = attempt < 50;
     const hands: Card[][] = [[], [], [], []];
     hands[me] = round.hands[me];
-    const capacity = [0, 1, 2, 3].map((s) => (s === me ? 0 : round.handCounts[s]));
+    const capacity = placesFor(others, round.handCounts, round.handBacks, byBacks);
     const cards = shuffleInPlace([...unknown], rnd);
     // Most constrained cards first
     const options = cards.map((c) => others.filter((s) => allowed(s, c, strict)));
     const order = cards.map((_, i) => i).sort((a, b) => options[a].length - options[b].length);
     let ok = true;
     for (const i of order) {
-      const open = options[i].filter((s) => capacity[s] > 0);
+      const color = bucket(cards[i], byBacks);
+      const open = options[i].filter((s) => capacity[s][color] > 0);
       if (open.length === 0) {
         ok = false;
         break;
       }
       const seat = open[Math.floor(rnd() * open.length)];
       hands[seat].push(cards[i]);
-      capacity[seat]--;
+      capacity[seat][color]--;
     }
     if (!ok) continue;
     if (strict && !mustHoldQueen.every((s) => hands[s].some(isKreuzDame))) continue;
     return hands;
   }
-  // Give up on constraints: plain random deal
-  const hands: Card[][] = [[], [], [], []];
+  // Give up on voids and Kreuz-Damen: random deal that still matches the backs
+  const hands = dealByBacks(unknown, others, round.handCounts, round.handBacks, rnd);
   hands[me] = round.hands[me];
-  const cards = shuffleInPlace([...unknown], rnd);
-  for (const s of others) hands[s] = cards.splice(0, round.handCounts[s]);
   return hands;
 }
 
@@ -133,6 +173,7 @@ export function buildWorld(view: DoppelkopfState, hands: Card[][]): DoppelkopfSt
       ...round,
       hands: hands.map((h) => [...h]),
       handCounts: hands.map((h) => h.length),
+      handBacks: hands.map(backsOf),
       currentTrick: { leader: round.currentTrick.leader, cards: [...round.currentTrick.cards] },
       tricks: [...round.tricks],
       parties: [...round.parties],

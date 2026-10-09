@@ -9,6 +9,7 @@ import {
   playCard,
   setReady,
 } from "../game/round";
+import { backColor, backsOf } from "../game/cards";
 import { legalCards } from "../game/rules";
 import type { DoppelkopfState, Reservation } from "../game/types";
 import { viewFor } from "../game/view";
@@ -25,6 +26,31 @@ function playAny(G: DoppelkopfState) {
   const card = legalCards(G.round.hands[seat], G.round.currentTrick.cards, G.round.gameType!)[0];
   expect(playCard(G, seat, card.id)).toBeNull();
 }
+
+describe("Rückseiten", () => {
+  test("je Karte eine rote und eine blaue Kopie, Zählung pro Hand", () => {
+    const G = initialState({ rounds: 4, withNines: true }, [], noShuffle);
+    const all = G.round.hands.flat();
+    expect(all.filter((c) => backColor(c) === "rot")).toHaveLength(24);
+    expect(all.filter((c) => backColor(c) === "blau")).toHaveLength(24);
+    expect(G.round.handBacks).toEqual(G.round.hands.map(backsOf));
+  });
+
+  test("ausgespielte Karte verringert die Farbe ihrer Rückseite", () => {
+    const G = initialState({ rounds: 4, withNines: false }, [], noShuffle);
+    reserve(G, ["gesund", "gesund", "gesund", "gesund"]);
+    const seat = G.round.toAct;
+    const before = { ...G.round.handBacks![seat] };
+    const card = legalCards(G.round.hands[seat], [], G.round.gameType!)[0];
+    playCard(G, seat, card.id);
+    const color = backColor(card)!;
+    expect(G.round.handBacks![seat][color]).toBe(before[color] - 1);
+    // Public: other players see the backs, not the cards
+    const view = viewFor(G, (seat + 1) % 4).round;
+    expect(view.hands[seat]).toEqual([]);
+    expect(view.handBacks![seat]).toEqual(G.round.handBacks![seat]);
+  });
+});
 
 describe("Geben", () => {
   test("12 Karten je Spieler, Seat 0 eröffnet", () => {

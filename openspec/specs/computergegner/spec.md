@@ -30,7 +30,7 @@ Ein NPC SHALL in jeder Phase handeln, in der er gefragt ist: Vorbehalt erklären
 - **THEN** spielt er nach 0,6–1,8 Sekunden eine gültige Karte
 
 ### Requirement: Spielstärke
-Das Kartenspiel der NPCs SHALL Partnerkenntnis, Bedienpflicht, Augenwerte und bereits gespielte Karten berücksichtigen: Stiche des eigenen Partners schmieren, fremde Stiche möglichst billig übernehmen oder billig abwerfen, Füchse schützen. In simulierten Partien SHALL eine Partei aus zwei „Professor“-NPCs gegen zwei Zufallsspieler deutlich mehr Punkte erzielen.
+Das Kartenspiel der NPCs SHALL Partnerkenntnis, Bedienpflicht, Augenwerte, bereits gespielte Karten und die sichtbaren roten und blauen Rückseiten der Mitspielerhände berücksichtigen: Stiche des eigenen Partners schmieren, fremde Stiche möglichst billig übernehmen oder billig abwerfen, Füchse schützen. In simulierten Partien SHALL eine Partei aus zwei „Professor“-NPCs gegen zwei Zufallsspieler deutlich mehr Punkte erzielen.
 
 #### Scenario: Simulierter Vergleich
 - **WHEN** 200 Runden Professor+Professor gegen zwei Zufallsspieler bei rotierenden Plätzen simuliert werden
