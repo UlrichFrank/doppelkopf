@@ -1,7 +1,7 @@
 import { useId } from "react";
 import type { Card as CardT, Rank, Suit } from "shared";
-import { cardName } from "shared";
-import type { BackColor } from "./backColor";
+import { backColor, cardName } from "shared";
+import type { BackColor } from "shared";
 
 /*
  * Classic French-suited deck in the style of the traditional Altenburg
@@ -256,15 +256,20 @@ interface CardProps {
   dimmed?: boolean;
 }
 
-/** A playing card, sized by its container width (aspect 2:3). */
+/**
+ * A playing card, sized by its container width (aspect 2:3). A small bar at
+ * the bottom edge shows the colour of its back (every card exists once with
+ * a red and once with a blue back).
+ */
 export function CardView({ card, className = "", dimmed = false }: CardProps) {
   const color = RED[card.suit] ? PIP_RED : INK;
+  const back = backColor(card);
   return (
     <svg
       viewBox="0 0 60 90"
       className={`block h-auto w-full select-none ${className}`}
       role="img"
-      aria-label={cardName(card)}
+      aria-label={back ? `${cardName(card)}, ${back}e Rückseite` : cardName(card)}
       style={{ color, filter: dimmed ? "saturate(0.2) brightness(0.62)" : undefined }}
     >
       <rect x="0.4" y="0.4" width="59.2" height="89.2" rx="4.2" fill="#fffefa" stroke="rgb(0 0 0 / 0.3)" strokeWidth="0.6" />
@@ -276,6 +281,7 @@ export function CardView({ card, className = "", dimmed = false }: CardProps) {
           </g>
         ))}
       </g>
+      {back && <rect x="23" y="83" width="14" height="3.2" rx="1.6" fill={BACK_FILL[back]} />}
     </svg>
   );
 }

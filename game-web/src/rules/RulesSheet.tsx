@@ -72,6 +72,18 @@ export function RulesSheet({ rules, onClose }: Props) {
             <p>Ass 11 · Zehn 10 · König 4 · Dame 3 · Bube 2 · Neun 0 – zusammen 240 Augen. Mit 121 Augen gewinnt Re, Kontra reichen 120.</p>
           </Section>
 
+          <Section title="Rote und blaue Rückseiten">
+            <p>
+              Wie am echten Tisch wird mit zwei gemischten Päckchen gespielt: von jeder Karte hat eine Kopie eine rote, die andere eine
+              blaue Rückseite. Bei den Mitspielern siehst du, wie viele rote und blaue Karten sie noch halten; auf jeder offenen Karte zeigt
+              ein kleiner Balken am unteren Rand die Farbe ihrer Rückseite.
+            </p>
+            <p>
+              Daraus lassen sich Schlüsse ziehen: Hältst du die Kreuz-Dame mit roter Rückseite, hat die andere eine blaue – wer keine blaue
+              Karte mehr hat, kann sie nicht haben. Die Computergegner nutzen dieselbe Information.
+            </p>
+          </Section>
+
           <Section title="Trumpf im Normalspiel">
             <p>Von hoch nach niedrig:</p>
             <div className="flex flex-wrap gap-1">

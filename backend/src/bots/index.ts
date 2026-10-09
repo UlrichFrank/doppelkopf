@@ -4,6 +4,7 @@
  * its seat would.
  */
 import {
+  backsOf,
   cardsPerPlayer,
   createDeck,
   hasHochzeit,
@@ -16,7 +17,7 @@ import {
 } from "shared";
 import type { AnnouncementLevel, Card, DoppelkopfState, GameType, NpcPersona, Reservation, Seat, SoloType } from "shared";
 import { chooseCardHeuristic } from "./heuristic";
-import { evaluateCandidates, playOut, type Rng, type Rollout } from "./montecarlo";
+import { dealByBacks, evaluateCandidates, playOut, type Rng, type Rollout } from "./montecarlo";
 import { PERSONA_PARAMS, type PersonaParams } from "./personas";
 
 export type BotAction =
@@ -130,12 +131,9 @@ export function simulateGameType(
   const n = hand.length;
   let total = 0;
   for (let i = 0; i < samples; i++) {
-    const cards = [...rest];
-    for (let k = cards.length - 1; k > 0; k--) {
-      const j = Math.floor(rnd() * (k + 1));
-      [cards[k], cards[j]] = [cards[j], cards[k]];
-    }
-    const hands: Card[][] = [0, 1, 2, 3].map((s) => (s === seat ? [...hand] : cards.splice(0, n)));
+    const others = [0, 1, 2, 3].filter((s) => s !== seat);
+    const hands = dealByBacks(rest, others, [n, n, n, n], r.handBacks, rnd);
+    hands[seat] = [...hand];
     const solo = gameType !== "normal";
     const queens = hands.map((h) => h.filter(isKreuzDame).length);
     const silent = !solo ? queens.findIndex((q) => q === 2) : -1;
@@ -151,6 +149,7 @@ export function simulateGameType(
         ...r,
         hands,
         handCounts: hands.map((h) => h.length),
+        handBacks: hands.map(backsOf),
         gameType: solo ? gameType : silent >= 0 ? "stilleHochzeit" : "normal",
         soloist: solo ? seat : silent >= 0 ? silent : null,
         alone: solo || silent >= 0,

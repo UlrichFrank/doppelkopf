@@ -1,5 +1,5 @@
 import { announcementError } from "./announcements";
-import { cardsPerPlayer, createDeck, isKreuzDame } from "./cards";
+import { backsOf, cardsPerPlayer, createDeck, isKreuzDame } from "./cards";
 import { isLegal, isSolo, trickWinner } from "./rules";
 import { scoreRound } from "./scoring";
 import type {
@@ -36,6 +36,7 @@ export function newRound(number: number, dealer: Seat, options: GameOptions, shu
     dealer,
     hands,
     handCounts: hands.map((h) => h.length),
+    handBacks: hands.map(backsOf),
     reservations: [null, null, null, null],
     reservationTurn: first,
     gameType: null,
@@ -174,6 +175,7 @@ export function playCard(G: DoppelkopfState, seat: Seat, cardId: string): string
 
   round.hands[seat] = hand.filter((c) => c.id !== cardId);
   round.handCounts[seat] = round.hands[seat].length;
+  if (round.handBacks) round.handBacks[seat] = backsOf(round.hands[seat]);
   round.currentTrick.cards.push({ seat, card });
   if (isKreuzDame(card) && (round.gameType === "normal" || round.gameType === "stilleHochzeit")) {
     round.revealed[seat] = true;

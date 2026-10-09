@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { initialState, viewFor } from "shared";
+import { backsOf, initialState, viewFor } from "shared";
 import { decide, type BotKind } from "../bots";
 import { knownVoids, sampleHands } from "../bots/montecarlo";
 import { mulberry32, shuffleWith, simulateGame } from "../simulation/simulate";
@@ -47,5 +47,15 @@ describe("Computergegner", () => {
     expect(hands.map((h) => h.length)).toEqual([12, 12, 12, 12]);
     expect(new Set(hands.flat().map((c) => c.id)).size).toBe(48);
     expect(knownVoids(view).every((v) => v.size === 0)).toBe(true);
+  });
+
+  test("Stichproben halten sich an die sichtbaren Rückseiten", () => {
+    const rnd = mulberry32(11);
+    const G = initialState({ rounds: 4, withNines: true }, [], shuffleWith(rnd));
+    const view = viewFor(G, 2);
+    for (let i = 0; i < 20; i++) {
+      const hands = sampleHands(view, 2, rnd);
+      expect(hands.map(backsOf)).toEqual(G.round.handBacks!);
+    }
   });
 });

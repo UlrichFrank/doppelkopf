@@ -13,18 +13,18 @@ Der Tisch SHALL den eigenen Platz unten, die Mitspieler links, oben und rechts i
 - **THEN** ist sein Platz hervorgehoben
 
 ### Requirement: Kartenbild
-Die Karten SHALL im klassischen französischen Bild (Altenburger Stil) erscheinen: Index aus Wert und Farbzeichen in allen vier Ecken, Zahlenkarten mit Farbzeichen in zwei Spalten, Bildkarten (König, Dame, Bube) doppelköpfig in Rot, Blau und Gold. Kartenrückseiten SHALL ein feines Muster in Rot oder Blau mit weißem Rand zeigen; wie mit zwei Kartenspielen am echten Tisch SHALL die Rückseitenfarbe von Runde zu Runde wechseln.
+Die Karten SHALL im klassischen französischen Bild (Altenburger Stil) erscheinen: Index aus Wert und Farbzeichen in allen vier Ecken, Zahlenkarten mit Farbzeichen in zwei Spalten, Bildkarten (König, Dame, Bube) doppelköpfig in Rot, Blau und Gold. Kartenrückseiten SHALL ein feines Muster in Rot oder Blau mit weißem Rand zeigen. Wie bei zwei gemischten Päckchen am echten Tisch SHALL von jeder Karte eine Kopie eine rote und die andere eine blaue Rückseite haben; jede offen liegende Karte SHALL die Farbe ihrer Rückseite mit einer kleinen Markierung am unteren Rand zeigen.
 
-#### Scenario: Rückseitenfarbe
-- **WHEN** Runde 1 und danach Runde 2 gespielt wird
-- **THEN** zeigen die Rückseiten in Runde 1 Blau und in Runde 2 Rot
+#### Scenario: Rückseite einer offenen Karte
+- **WHEN** eine Karte im Stich liegt
+- **THEN** zeigt ihre Markierung, ob sie die rote oder die blaue Kopie ist
 
 ### Requirement: Hände der Mitspieler
-Die Hand jedes Mitspielers SHALL als Fächer verdeckter Karten mit genau so vielen Karten gezeigt werden, wie er noch hält; beim oberen Mitspieler waagerecht, bei den seitlichen senkrecht.
+Die Hand jedes Mitspielers SHALL als Fächer verdeckter Karten mit genau so vielen Karten gezeigt werden, wie er noch hält, jeweils mit der echten Rückseitenfarbe, dazu die Zahl roter und blauer Karten; beim oberen Mitspieler waagerecht, bei den seitlichen senkrecht. Die Zahl roter und blauer Karten jeder Hand SHALL für alle sichtbar sein (verdeckte Information umfasst nur die Kartenwerte).
 
 #### Scenario: Karte gespielt
-- **WHEN** ein Mitspieler eine Karte spielt
-- **THEN** zeigt sein Fächer eine Karte weniger
+- **WHEN** ein Mitspieler eine Karte mit blauer Rückseite spielt
+- **THEN** zeigt sein Fächer eine blaue Karte weniger
 
 ### Requirement: Spielregeln nachlesen
 Die Spielregeln SHALL auf der Startseite und am Tisch (Tischmenü) nachgelesen werden können. Am Tisch SHALL die Regelansicht zeigen, welche Hausregeln an diesem Tisch gelten.
