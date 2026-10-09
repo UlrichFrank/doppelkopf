@@ -8,8 +8,8 @@ import { serveStatic } from "./staticFiles";
 import { assets } from "./embedded";
 
 const PORT = parseInt(process.env.PORT ?? "3003", 10);
-// Bind address; unset = all interfaces. In production the gateway of the
-// Docker network Traefik runs in, so only Traefik can reach the server.
+// Bind address; unset = all interfaces. In production 127.0.0.1, so only
+// Traefik on the same host can reach the server.
 const HOST = process.env.HOST || undefined;
 
 // Additional allowed origins (comma-separated), e.g. the deployed frontend URL

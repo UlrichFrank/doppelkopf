@@ -1,16 +1,13 @@
 # Doppelkopf: game server, NPCs and embedded game page as a single binary.
 # Installed to /etc/systemd/system/doppelkopf.service by `make deploy`.
-# Traefik (Docker stack ~/deploy/traefik) routes to it via the file provider,
+# Traefik (systemd, /etc/traefik) routes to it via the file provider,
 # see traefik-doppelkopf.yml.
 
 [Unit]
 Description=Doppelkopf (Spielserver, Computergegner und Spielseite)
 Documentation=https://github.com/UlrichFrank/doppelkopf/blob/main/deploy/README.md
-# The bind address is the gateway of the Docker network "web", which only
-# exists once Docker is up
-Wants=network-online.target docker.service
-After=network-online.target docker.service
-# Keep retrying until the address exists (e.g. right after boot)
+Wants=network-online.target
+After=network-online.target
 StartLimitIntervalSec=0
 
 [Service]
@@ -21,9 +18,9 @@ ExecStart=/opt/doppelkopf/doppelkopf
 WorkingDirectory=/var/lib/doppelkopf
 StateDirectory=doppelkopf
 Environment=NODE_ENV=production
-# Only reachable for Traefik (Docker network "web"), not from the internet.
+# Loopback only: reachable for Traefik on the same host, not from the internet.
 # Port 3001 on this address belongs to Ausgebremst, 3002 to Molthar.
-Environment=HOST=172.18.0.1
+Environment=HOST=127.0.0.1
 Environment=PORT=3003
 Environment=MATCHES_FILE=/var/lib/doppelkopf/matches.json
 # NPC seat credentials — without them running NPC matches hang after a restart
