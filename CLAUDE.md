@@ -48,7 +48,7 @@ The BotRunner scans the lobby for `setupData.npcSlots`, joins those seats (crede
 
 ### Frontend (`game-web/src/`)
 
-`App.tsx` = lobby state machine (start → waiting room → table), session in localStorage, invite link `/?match=<id>`. `table/` = game table (Hand, OpponentHand, TrickArea, SeatBadge, Bierdeckel score, RoundSummary). `cards/Card.tsx` draws the French-suited deck (Altenburg style) as SVG; `rules/` = rules sheet and the list of house rules offered in the lobby. PWA: `public/manifest.webmanifest`, `public/sw.js` (version stamped by `vite.config.ts`), icons rendered by `scripts/render-icons.sh`.
+`App.tsx` = lobby state machine (start → waiting room → table), session in localStorage, invite link `/?match=<id>`. `table/` = game table (Hand, OpponentHand, TrickArea, SeatBadge, Bierdeckel score, RoundSummary). `cards/Card.tsx` draws the French-suited deck (Altenburg style) as SVG; `rules/` = rules sheet and the list of house rules offered in the lobby. PWA as in TeamWERK: `vite-plugin-pwa` (injectManifest) — manifest in `vite.config.ts`, service worker `src/sw.ts` (precache build files, page network first, `/games` and `/socket.io` never cached), update banner `src/pwa/UpdateBanner.tsx`; icons rendered by `scripts/render-icons.sh`.
 
 ### TypeScript config
 
