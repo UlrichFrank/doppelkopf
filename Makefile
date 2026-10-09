@@ -4,11 +4,11 @@
 # ── vServer deployment (single binary behind Traefik, see deploy/README.md) ──
 DEPLOY_HOST  ?= vServer
 DEPLOY_DIR   ?= /opt/doppelkopf
-TRAEFIK_DIR  ?= /root/deploy/traefik
-# Gateway of the Docker network "web": the binary listens there, Traefik
-# connects to it. Must match doppelkopf.service and traefik-doppelkopf.yml.
+TRAEFIK_DIR  ?= /etc/traefik
+# The binary listens on loopback, only Traefik on the same host reaches it.
+# Must match doppelkopf.service and traefik-doppelkopf.yml.
 # Port 3001 is Ausgebremst, 3002 Molthar.
-GATEWAY_IP   ?= 172.18.0.1
+BIND_IP      ?= 127.0.0.1
 SERVICE_PORT ?= 3003
 APP_URL      ?= https://doppelkopf.apps.diefranks.eu
 
@@ -100,17 +100,15 @@ smoke:
 # ── Deployment (vServer) ──────────────────────────────────────────────────────
 deploy-init:
 	ssh $(DEPLOY_HOST) 'set -e; id doppelkopf >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin doppelkopf; \
-		mkdir -p $(DEPLOY_DIR) $(TRAEFIK_DIR)/dynamic; \
-		test "$$(docker network inspect web --format "{{range .IPAM.Config}}{{.Gateway}}{{end}}")" = "$(GATEWAY_IP)"; \
-		grep -q "directory: /etc/traefik/dynamic" $(TRAEFIK_DIR)/traefik.yml'
+		mkdir -p $(DEPLOY_DIR); \
+		systemctl is-active --quiet traefik; test -d $(TRAEFIK_DIR)/dynamic'
 	@echo "$(GREEN)✓ vServer ready for make deploy$(NC)"
 
 deploy: binary deploy-upload
 
 deploy-upload:
-	@echo "$(BLUE)Checking gateway of Docker network web on $(DEPLOY_HOST)...$(NC)"
-	@ssh $(DEPLOY_HOST) 'test "$$(docker network inspect web --format "{{range .IPAM.Config}}{{.Gateway}}{{end}}")" = "$(GATEWAY_IP)"' \
-		|| { echo "Gateway of network web is not $(GATEWAY_IP) — adjust GATEWAY_IP, the unit and the routing file"; exit 1; }
+	@ssh $(DEPLOY_HOST) 'systemctl is-active --quiet traefik' \
+		|| { echo "Traefik is not running on $(DEPLOY_HOST) — make server-setup in the spielothek repo"; exit 1; }
 	@echo "$(BLUE)Uploading binary, unit and routing...$(NC)"
 	scp -q dist/doppelkopf-linux-x64 $(DEPLOY_HOST):$(DEPLOY_DIR)/doppelkopf.new
 	scp -q deploy/doppelkopf/doppelkopf.service $(DEPLOY_HOST):/etc/systemd/system/doppelkopf.service
@@ -123,7 +121,7 @@ deploy-upload:
 	@echo "$(GREEN)✓ Deployed: $(APP_URL)$(NC)"
 
 deploy-check:
-	@ssh $(DEPLOY_HOST) 'for i in $$(seq 1 30); do curl -sf -o /dev/null http://$(GATEWAY_IP):$(SERVICE_PORT)/games && exit 0; sleep 0.5; done; exit 1' \
+	@ssh $(DEPLOY_HOST) 'for i in $$(seq 1 30); do curl -sf -o /dev/null http://$(BIND_IP):$(SERVICE_PORT)/games && exit 0; sleep 0.5; done; exit 1' \
 		|| { echo "Service does not answer — see make deploy-logs"; exit 1; }
 	@for i in $$(seq 1 20); do curl -sf -o /dev/null $(APP_URL)/ && break; sleep 1; done; \
 		curl -sf -o /dev/null $(APP_URL)/ || { echo "$(APP_URL) does not answer via Traefik"; exit 1; }
