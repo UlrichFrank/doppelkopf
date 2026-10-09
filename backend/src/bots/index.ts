@@ -8,6 +8,7 @@ import {
   createDeck,
   hasHochzeit,
   isKreuzDame,
+  mayThrowIn,
   isTrump,
   legalCards,
   nextAnnouncement,
@@ -65,7 +66,15 @@ function choosePlay(view: DoppelkopfState, seat: Seat, kind: BotKind, rnd: Rng):
 function heuristicCard(view: DoppelkopfState, seat: Seat, rnd: Rng): Card {
   const r = view.round;
   return chooseCardHeuristic(
-    { seat, hand: r.hands[seat], gameType: r.gameType!, trick: r.currentTrick.cards, tricks: r.tricks, parties: r.parties },
+    {
+      seat,
+      hand: r.hands[seat],
+      gameType: r.gameType!,
+      trick: r.currentTrick.cards,
+      tricks: r.tricks,
+      parties: r.parties,
+      secondDulleWins: view.options.secondDulleWins,
+    },
     rnd,
   );
 }
@@ -165,11 +174,14 @@ export function simulateGameType(
 
 function chooseReservation(view: DoppelkopfState, seat: Seat, kind: BotKind, rnd: Rng): Reservation {
   const hand = view.round.hands[seat];
-  if (kind === "random" || kind === "heuristic") return "gesund";
+  if (kind === "random") return "gesund";
+  // Five Neunen or Könige make a weak hand: throw it in when the table allows it
+  const fallback: Reservation =
+    view.options.schmeissen && mayThrowIn(hand) ? "schmeissen" : hasHochzeit(hand) ? "hochzeit" : "gesund";
+  if (kind === "heuristic") return fallback;
   const params: PersonaParams = PERSONA_PARAMS[kind];
   const candidates = soloCandidates(hand);
-  const wedding = hasHochzeit(hand);
-  if (candidates.length === 0) return wedding ? "hochzeit" : "gesund";
+  if (candidates.length === 0) return fallback;
 
   const samples = params.reservationSamples;
   const normal = simulateGameType(view, seat, "normal", samples, rnd);
@@ -179,5 +191,5 @@ function chooseReservation(view: DoppelkopfState, seat: Seat, kind: BotKind, rnd
     if (!best || value > best.value) best = { solo, value };
   }
   if (best && best.value >= params.soloMin && best.value - normal >= params.soloMargin) return best.solo;
-  return wedding ? "hochzeit" : "gesund";
+  return fallback;
 }

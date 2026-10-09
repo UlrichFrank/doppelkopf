@@ -34,7 +34,8 @@ export const Doppelkopf: Game<DoppelkopfState, Record<string, unknown>, SetupDat
     const rounds = validRounds(setupData?.rounds) ? setupData!.rounds! : 8;
     const withNines = setupData?.withNines ?? true;
     const npcSlots = (setupData?.npcSlots ?? []).filter((s) => s.seat >= 1 && s.seat <= 3);
-    return initialState({ rounds, withNines }, npcSlots, (items) => random.Shuffle(items));
+    const variants = { secondDulleWins: setupData?.secondDulleWins === true, schmeissen: setupData?.schmeissen === true };
+    return initialState({ rounds, withNines, ...variants }, npcSlots, (items) => random.Shuffle(items));
   },
 
   validateSetupData(setupData, numPlayers) {
@@ -48,8 +49,8 @@ export const Doppelkopf: Game<DoppelkopfState, Record<string, unknown>, SetupDat
   turn: { activePlayers: ActivePlayers.ALL },
 
   moves: {
-    declareReservation: serverMove(({ G, playerID }, reservation: Reservation) =>
-      valid(declareReservation(G, Number(playerID), reservation)),
+    declareReservation: serverMove(({ G, playerID, random }, reservation: Reservation) =>
+      valid(declareReservation(G, Number(playerID), reservation, (items) => random.Shuffle(items))),
     ),
     playCard: serverMove(({ G, playerID }, cardId: string) => valid(playCard(G, Number(playerID), cardId))),
     announce: serverMove(({ G, playerID }, level: AnnouncementLevel) => valid(announce(G, Number(playerID), level))),

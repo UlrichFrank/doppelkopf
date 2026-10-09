@@ -12,6 +12,7 @@ import type {
   Party,
   Reservation,
   RoundState,
+  RuleVariants,
   Seat,
 } from "./types";
 
@@ -48,6 +49,7 @@ export function newRound(number: number, dealer: Seat, options: GameOptions, shu
     announcements: { re: 0, kontra: 0 },
     announcementLog: [],
     clarifiedAfterTricks: null,
+    thrown: null,
     result: null,
   };
 }
@@ -73,20 +75,42 @@ export function hasHochzeit(hand: Card[]): boolean {
   return hand.filter(isKreuzDame).length === 2;
 }
 
-/** Reservations `seat` may declare with `hand`. */
-export function allowedReservations(hand: Card[]): Reservation[] {
+/** Schmeißen (house rule): five or more Neunen or five or more Könige. */
+export const SCHMEISSEN_MIN = 5;
+
+export function mayThrowIn(hand: Card[]): boolean {
+  const count = (rank: Card["rank"]) => hand.filter((c) => c.rank === rank).length;
+  return count("9") >= SCHMEISSEN_MIN || count("K") >= SCHMEISSEN_MIN;
+}
+
+/** Reservations `seat` may declare with `hand` under the table's rule variants. */
+export function allowedReservations(hand: Card[], variants: RuleVariants = {}): Reservation[] {
   const out: Reservation[] = ["gesund"];
   if (hasHochzeit(hand)) out.push("hochzeit");
+  if (variants.schmeissen && mayThrowIn(hand)) out.push("schmeissen");
   out.push("damen", "buben", "fleischlos", "kreuz", "pik", "herz", "karo");
   return out;
 }
 
-/** Returns an error message or null on success. */
-export function declareReservation(G: DoppelkopfState, seat: Seat, reservation: Reservation): string | null {
+/**
+ * Returns an error message or null on success. `shuffle` is needed for
+ * "schmeissen", which deals the round again (same number, same dealer).
+ */
+export function declareReservation(
+  G: DoppelkopfState,
+  seat: Seat,
+  reservation: Reservation,
+  shuffle?: Shuffle,
+): string | null {
   const round = G.round;
   if (G.stage !== "reservations") return "Keine Vorbehaltsabfrage";
   if (round.reservationTurn !== seat) return "Nicht an der Reihe";
-  if (!allowedReservations(round.hands[seat]).includes(reservation)) return "Vorbehalt nicht erlaubt";
+  if (!allowedReservations(round.hands[seat], G.options).includes(reservation)) return "Vorbehalt nicht erlaubt";
+  if (reservation === "schmeissen") {
+    if (!shuffle) return "Neu geben nicht möglich";
+    G.round = { ...newRound(round.number, round.dealer, G.options, shuffle), thrown: { seat, hand: round.hands[seat] } };
+    return null;
+  }
   round.reservations[seat] = reservation;
   const next = nextSeat(seat);
   if (next === nextSeat(round.dealer)) {
@@ -160,7 +184,7 @@ export function playCard(G: DoppelkopfState, seat: Seat, cardId: string): string
     return null;
   }
 
-  const winner = trickWinner(round.currentTrick.cards, round.gameType);
+  const winner = trickWinner(round.currentTrick.cards, round.gameType, G.options.secondDulleWins ?? false);
   round.tricks.push({ ...round.currentTrick, winner });
   round.currentTrick = { leader: winner, cards: [] };
   round.toAct = winner;

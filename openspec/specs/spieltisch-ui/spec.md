@@ -12,6 +12,27 @@ Der Tisch SHALL den eigenen Platz unten, die Mitspieler links, oben und rechts i
 - **WHEN** der linke Mitspieler am Zug ist
 - **THEN** ist sein Platz hervorgehoben
 
+### Requirement: Kartenbild
+Die Karten SHALL im klassischen französischen Bild (Altenburger Stil) erscheinen: Index aus Wert und Farbzeichen in allen vier Ecken, Zahlenkarten mit Farbzeichen in zwei Spalten, Bildkarten (König, Dame, Bube) doppelköpfig in Rot, Blau und Gold. Kartenrückseiten SHALL ein feines Muster in Rot oder Blau mit weißem Rand zeigen; wie mit zwei Kartenspielen am echten Tisch SHALL die Rückseitenfarbe von Runde zu Runde wechseln.
+
+#### Scenario: Rückseitenfarbe
+- **WHEN** Runde 1 und danach Runde 2 gespielt wird
+- **THEN** zeigen die Rückseiten in Runde 1 Blau und in Runde 2 Rot
+
+### Requirement: Hände der Mitspieler
+Die Hand jedes Mitspielers SHALL als Fächer verdeckter Karten mit genau so vielen Karten gezeigt werden, wie er noch hält; beim oberen Mitspieler waagerecht, bei den seitlichen senkrecht.
+
+#### Scenario: Karte gespielt
+- **WHEN** ein Mitspieler eine Karte spielt
+- **THEN** zeigt sein Fächer eine Karte weniger
+
+### Requirement: Spielregeln nachlesen
+Die Spielregeln SHALL auf der Startseite und am Tisch (Tischmenü) nachgelesen werden können. Am Tisch SHALL die Regelansicht zeigen, welche Hausregeln an diesem Tisch gelten.
+
+#### Scenario: Regeln am Tisch
+- **WHEN** ein Spieler im Tischmenü „Spielregeln“ wählt
+- **THEN** sieht er die Regeln und die an diesem Tisch gewählten Varianten
+
 ### Requirement: Eigene Hand
 Die eigenen Karten SHALL sortiert angezeigt werden (Trümpfe in Spielreihenfolge, dann Fehlfarben), passend zur aktuellen Spielart. Ist der Spieler am Zug, SHALL nicht spielbare Karten abgeblendet sein. Eine Karte SHALL per Antippen ausgewählt und per zweitem Antippen gespielt werden; am Desktop SHALL ein Doppelklick oder Klick auf die bereits gewählte Karte spielen.
 

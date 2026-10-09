@@ -19,7 +19,9 @@ interface Props {
 
 export function TrickArea({ cards, me, winner, message }: Props) {
   return (
-    <div className="relative aspect-[1.15] w-full max-w-[22rem]">
+    // Sized by the cell's width and height (container query units), so the
+    // trick never spills onto the seats above and below
+    <div className="relative aspect-[1.15] w-[min(100cqw,22rem,115cqh)]">
       {cards.map(({ seat, card }) => {
         const rel = (seat - me + 4) % 4;
         const slot = SLOT[rel];

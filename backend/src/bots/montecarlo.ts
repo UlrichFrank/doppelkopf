@@ -171,7 +171,15 @@ export function playOut(world: DoppelkopfState, rnd: Rng): void {
     const r = world.round;
     const seat = r.toAct;
     const card = chooseCardHeuristic(
-      { seat, hand: r.hands[seat], gameType: r.gameType!, trick: r.currentTrick.cards, tricks: r.tricks, parties: r.parties },
+      {
+        seat,
+        hand: r.hands[seat],
+        gameType: r.gameType!,
+        trick: r.currentTrick.cards,
+        tricks: r.tricks,
+        parties: r.parties,
+        secondDulleWins: world.options.secondDulleWins,
+      },
       rnd,
     );
     playCard(world, seat, card.id);

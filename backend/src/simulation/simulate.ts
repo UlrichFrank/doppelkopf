@@ -4,7 +4,7 @@
  * invariants on the way.
  */
 import { announce, declareReservation, initialState, playCard, setReady, viewFor } from "shared";
-import type { DoppelkopfState, RoundResult } from "shared";
+import type { DoppelkopfState, RoundResult, RuleVariants } from "shared";
 import { decide, type BotKind } from "../bots";
 import type { Rng } from "../bots/montecarlo";
 
@@ -38,10 +38,16 @@ export interface GameRun {
 }
 
 /** Plays a whole game (`rounds` deals) with the given bot per seat. */
-export function simulateGame(kinds: BotKind[], rounds: number, seed: number, withNines = true): GameRun {
+export function simulateGame(
+  kinds: BotKind[],
+  rounds: number,
+  seed: number,
+  withNines = true,
+  variants: RuleVariants = {},
+): GameRun {
   const rnd = mulberry32(seed);
   const shuffle = shuffleWith(rnd);
-  const G: DoppelkopfState = initialState({ rounds, withNines }, [], shuffle);
+  const G: DoppelkopfState = initialState({ rounds, withNines, ...variants }, [], shuffle);
   const decisionMs: Record<string, number[]> = {};
   let steps = 0;
 
@@ -56,7 +62,7 @@ export function simulateGame(kinds: BotKind[], rounds: number, seed: number, wit
       let error: string | null;
       switch (action.move) {
         case "declareReservation":
-          error = declareReservation(G, seat, action.args[0]);
+          error = declareReservation(G, seat, action.args[0], shuffle);
           break;
         case "playCard":
           error = playCard(G, seat, action.args[0]);

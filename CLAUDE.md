@@ -30,8 +30,10 @@ Doppelkopf (DDV tournament rules, with or without nines) for 4 seats, 1–4 huma
 
 ### Rules engine (`shared/src/game/`)
 
-- `rules.ts` — trump/Fehl order per game type, `legalCards`, `trickWinner` (second Dulle beats first)
-- `round.ts` — dealing, reservations (solo > Hochzeit, silent Hochzeit), playing, Hochzeit clarification, round end; `pendingAction(G, seat)` says what a seat has to do
+DDV tournament rules by default; house rules live in `RuleVariants` (part of `GameOptions`/`SetupData`, absent = DDV).
+
+- `rules.ts` — trump/Fehl order per game type, `legalCards`, `trickWinner` (equal cards: first wins, also the Dullen — DDV; house rule `secondDulleWins` flips that)
+- `round.ts` — dealing, reservations (solo > Hochzeit, silent Hochzeit, house rule Schmeißen = redeal), playing, Hochzeit clarification, round end; `pendingAction(G, seat)` says what a seat has to do
 - `announcements.ts` — Re/Kontra/keine 90… deadlines (Erwiderung, Hochzeit shift)
 - `scoring.ts` — winner determination, game points, special points, solo ×3
 - `view.ts` — `playerView`: own hand only, parties only when publicly known, reservations hidden, silent Hochzeit looks normal
@@ -46,7 +48,7 @@ The BotRunner scans the lobby for `setupData.npcSlots`, joins those seats (crede
 
 ### Frontend (`game-web/src/`)
 
-`App.tsx` = lobby state machine (start → waiting room → table), session in localStorage, invite link `/?match=<id>`. `table/` = game table (Hand, TrickArea, SeatBadge, Bierdeckel score, RoundSummary). PWA: `public/manifest.webmanifest`, `public/sw.js` (version stamped by `vite.config.ts`), icons rendered by `scripts/render-icons.sh`.
+`App.tsx` = lobby state machine (start → waiting room → table), session in localStorage, invite link `/?match=<id>`. `table/` = game table (Hand, OpponentHand, TrickArea, SeatBadge, Bierdeckel score, RoundSummary). `cards/Card.tsx` draws the French-suited deck (Altenburg style) as SVG; `rules/` = rules sheet and the list of house rules offered in the lobby. PWA: `public/manifest.webmanifest`, `public/sw.js` (version stamped by `vite.config.ts`), icons rendered by `scripts/render-icons.sh`.
 
 ### TypeScript config
 

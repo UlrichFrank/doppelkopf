@@ -6,7 +6,7 @@ Bringt 1 bis 4 Menschen und die Computergegner an einen Tisch: Partie anlegen, P
 ## Requirements
 
 ### Requirement: Partie anlegen
-Ein Spieler SHALL nach Eingabe seines Namens eine Partie mit genau vier Plätzen anlegen können. Platz 1 SHALL er selbst belegen; jeden der Plätze 2–4 SHALL er als „Mensch“ oder als Computergegner mit wählbarer Persönlichkeit festlegen. Zusätzlich SHALL er Rundenzahl und „mit/ohne Neunen“ wählen. Es SHALL also 1 bis 4 menschliche Spieler geben.
+Ein Spieler SHALL nach Eingabe seines Namens eine Partie mit genau vier Plätzen anlegen können. Platz 1 SHALL er selbst belegen; jeden der Plätze 2–4 SHALL er als „Mensch“ oder als Computergegner mit wählbarer Persönlichkeit festlegen. Zusätzlich SHALL er Rundenzahl, „mit/ohne Neunen“ und die Hausregeln „Zweite Dulle sticht die erste“ und „Schmeißen“ wählen (Standard: aus, also DDV-Regeln). Die Liste offener Tische SHALL gewählte Hausregeln nennen. Es SHALL also 1 bis 4 menschliche Spieler geben.
 
 #### Scenario: Allein gegen drei Computer
 - **WHEN** ein Spieler eine Partie mit drei Computerplätzen anlegt

@@ -14,8 +14,11 @@ export type Seat = number;
 
 export type SoloType = "damen" | "buben" | "fleischlos" | "karo" | "herz" | "pik" | "kreuz";
 
-/** What a player declares before the first trick. */
-export type Reservation = "gesund" | "hochzeit" | SoloType;
+/**
+ * What a player declares before the first trick. "schmeissen" (house rule,
+ * only when enabled) throws the cards in: the same dealer deals again.
+ */
+export type Reservation = "gesund" | "hochzeit" | "schmeissen" | SoloType;
 
 /**
  * The game type of a round. `stilleHochzeit`: a player with both Kreuz-Damen
@@ -109,10 +112,23 @@ export interface RoundState {
   announcementLog: AnnouncementEntry[];
   /** Hochzeit: number of tricks played when the partner was determined; null before. */
   clarifiedAfterTricks: number | null;
+  /** The previous deal of this round was thrown in ("geschmissen"); the hand is shown to everybody. */
+  thrown: { seat: Seat; hand: Card[] } | null;
   result: RoundResult | null;
 }
 
-export interface GameOptions {
+/**
+ * Optional house rules. Absent = DDV tournament rules (also for matches
+ * stored before the variants existed).
+ */
+export interface RuleVariants {
+  /** The second Herz-Zehn beats the first (DDV: the first played wins). */
+  secondDulleWins?: boolean;
+  /** With five or more Neunen or Könige a player may throw the cards in. */
+  schmeissen?: boolean;
+}
+
+export interface GameOptions extends RuleVariants {
   rounds: number;
   withNines: boolean;
 }
@@ -124,7 +140,7 @@ export interface NpcSlotConfig {
   persona: NpcPersona;
 }
 
-export interface SetupData {
+export interface SetupData extends RuleVariants {
   rounds?: number;
   withNines?: boolean;
   npcSlots?: NpcSlotConfig[];

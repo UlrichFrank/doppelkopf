@@ -31,7 +31,7 @@ export function AnnounceButton({ party, level, onAnnounce }: Props) {
           setArmed(true);
         }
       }}
-      className={`rounded-full px-4 py-1.5 font-extrabold shadow-md transition-colors ${
+      className={`relative z-20 rounded-full px-4 py-1.5 font-extrabold shadow-md transition-colors ${
         armed ? "bg-card-red text-paper" : party === "re" ? "bg-re text-wood-950" : "bg-kontra text-wood-950"
       }`}
     >

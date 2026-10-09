@@ -2,6 +2,7 @@
  * Bot tournament on the command line.
  *
  *   bun src/simulation/run.ts [games] [--rounds=8] [--a=professor] [--b=random] [--seed=1]
+ *                             [--dulle2] [--schmeissen]
  *
  * Seats alternate a/b/a/b; across games the seating rotates so both kinds
  * play every position. Reports points per kind, game types and decision times.
@@ -18,6 +19,7 @@ const rounds = parseInt(opt("rounds", "8"), 10);
 const a = opt("a", "professor") as BotKind;
 const b = opt("b", "random") as BotKind;
 const seed = parseInt(opt("seed", "1"), 10);
+const variants = { secondDulleWins: args.includes("--dulle2"), schmeissen: args.includes("--schmeissen") };
 
 const totals: Record<string, number> = { [a]: 0, [b]: 0 };
 const types: Record<string, number> = {};
@@ -27,7 +29,7 @@ let roundsPlayed = 0;
 
 for (let g = 0; g < games; g++) {
   const kinds: BotKind[] = g % 2 === 0 ? [a, b, a, b] : [b, a, b, a];
-  const run = simulateGame(kinds, rounds, seed + g);
+  const run = simulateGame(kinds, rounds, seed + g, true, variants);
   run.scores.forEach((s, seat) => (totals[kinds[seat]] += s / 2));
   for (const r of run.history) {
     types[GAME_TYPE_NAME[r.gameType]] = (types[GAME_TYPE_NAME[r.gameType]] ?? 0) + 1;

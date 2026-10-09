@@ -1,5 +1,6 @@
 import type { DoppelkopfState } from "shared";
-import { CardBack } from "../cards/Card";
+import { backColorForRound } from "../cards/backColor";
+import { OpponentHand } from "./OpponentHand";
 import { partyName, RESERVATION_LABEL, seatAnnouncement } from "./labels";
 
 interface Props {
@@ -8,12 +9,12 @@ interface Props {
   name: string;
   active: boolean;
   connected: boolean;
-  /** Show the stack of card backs (opponents). */
-  showBacks: boolean;
+  /** Opponents: where they sit, for their hand of card backs. */
+  hand?: "top" | "left" | "right";
   compact?: boolean;
 }
 
-export function SeatBadge({ G, seat, name, active, connected, showBacks, compact = false }: Props) {
+export function SeatBadge({ G, seat, name, active, connected, hand, compact = false }: Props) {
   const r = G.round;
   const party = r.parties[seat];
   const reservation = r.gameType === null ? r.reservations[seat] : null;
@@ -23,18 +24,9 @@ export function SeatBadge({ G, seat, name, active, connected, showBacks, compact
   const count = r.handCounts[seat];
 
   return (
-    <div className={`flex flex-col items-center gap-1 ${compact ? "max-w-[6.5rem]" : "max-w-[10rem]"}`}>
-      {showBacks && count > 0 && (
-        <div className="relative h-9 w-16" aria-label={`${count} Karten`}>
-          {Array.from({ length: Math.min(count, 6) }, (_, i) => (
-            <div key={i} className="absolute top-0 w-6" style={{ left: i * 6, transform: `rotate(${(i - 2.5) * 5}deg)` }}>
-              <CardBack />
-            </div>
-          ))}
-        </div>
-      )}
+    <div className={`flex flex-col items-center gap-1.5 ${compact ? "max-w-[6.5rem]" : "max-w-[10rem]"}`}>
       <div
-        className={`rounded-xl px-2.5 py-1 text-center ring-1 transition-shadow ${
+        className={`relative z-20 rounded-xl px-2.5 py-1 text-center ring-1 transition-shadow ${
           active ? "bg-re/20 ring-re [animation:pulse-ring_1.6s_ease-in-out_infinite]" : "bg-wood-950/60 ring-wood-500/40"
         } ${connected ? "" : "opacity-55"}`}
       >
@@ -62,6 +54,7 @@ export function SeatBadge({ G, seat, name, active, connected, showBacks, compact
           {!connected && <span className="text-chalk/60">offline</span>}
         </div>
       </div>
+      {hand && <OpponentHand count={count} side={hand} color={backColorForRound(r.number)} />}
     </div>
   );
 }

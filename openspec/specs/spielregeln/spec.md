@@ -62,14 +62,18 @@ Ein Spieler SHALL die angespielte Farbe bedienen (Trumpf gilt als eigene Farbe),
 - **THEN** darf er Trumpf oder eine andere Fehlfarbe spielen
 
 ### Requirement: Stichvergabe
-Den Stich SHALL die höchste Trumpfkarte gewinnen; liegt kein Trumpf, die höchste Karte der angespielten Farbe. Bei zwei gleichen Karten SHALL die zuerst gespielte gewinnen, ausgenommen die Dulle: die zweite Herz-Zehn SHALL die erste schlagen, sofern Herz-Zehn Trumpf ist. Der Stichgewinner SHALL den nächsten Stich eröffnen.
+Den Stich SHALL die höchste Trumpfkarte gewinnen; liegt kein Trumpf, die höchste Karte der angespielten Farbe. Bei zwei gleichen Karten SHALL die zuerst gespielte gewinnen – nach DDV-Regeln auch bei den beiden Herz-Zehnen. Nur wenn beim Anlegen die Hausregel „Zweite Dulle sticht die erste“ gewählt wurde, SHALL die zweite Herz-Zehn die erste schlagen, sofern Herz-Zehn Trumpf ist. Der Stichgewinner SHALL den nächsten Stich eröffnen.
 
 #### Scenario: Gleiche Karten
 - **WHEN** zwei Kreuz-Damen in einem Stich liegen und keine Dulle
 - **THEN** gewinnt die zuerst gespielte Kreuz-Dame
 
-#### Scenario: Zweite Dulle
-- **WHEN** beide Herz-Zehnen im Normalspiel in einem Stich liegen
+#### Scenario: Zwei Dullen (DDV)
+- **WHEN** beide Herz-Zehnen im Normalspiel in einem Stich liegen und keine Hausregel gewählt ist
+- **THEN** gewinnt die zuerst gespielte Herz-Zehn
+
+#### Scenario: Zwei Dullen (Hausregel)
+- **WHEN** beide Herz-Zehnen im Normalspiel in einem Stich liegen und „Zweite Dulle sticht die erste“ gewählt ist
 - **THEN** gewinnt die zweite Herz-Zehn
 
 ### Requirement: Vorbehalte
@@ -86,6 +90,17 @@ Vor dem ersten Stich SHALL jeder Spieler reihum, beginnend links vom Geber, „g
 #### Scenario: Solo-Ausspiel
 - **WHEN** ein Solo gespielt wird
 - **THEN** eröffnet der Solist den ersten Stich
+
+### Requirement: Schmeißen (Hausregel)
+Nach DDV-Regeln SHALL jedes Blatt gespielt werden; es gibt keine Augengrenze und kein Neugeben. Nur wenn beim Anlegen die Hausregel „Schmeißen“ gewählt wurde, SHALL ein Spieler mit mindestens fünf Neunen oder mindestens fünf Königen bei seiner Vorbehaltsabfrage schmeißen dürfen: seine Hand SHALL allen gezeigt werden, derselbe Geber SHALL neu geben und die Runde SHALL nicht gezählt werden.
+
+#### Scenario: Schmeißen ohne Hausregel
+- **WHEN** ein Spieler mit fünf Neunen an einem Tisch ohne Hausregel schmeißen will
+- **THEN** lehnt der Server das ab
+
+#### Scenario: Schmeißen mit Hausregel
+- **WHEN** ein Spieler mit fünf Königen an einem Tisch mit Hausregel schmeißt
+- **THEN** gibt derselbe Geber neu, die Rundennummer bleibt gleich und alle sehen die geschmissene Hand
 
 ### Requirement: Parteien
 Im Normalspiel SHALL die Re-Partei aus den Haltern der Kreuz-Damen bestehen, die Kontra-Partei aus den übrigen. Hält ein Spieler im Normalspiel beide Kreuz-Damen und hat „gesund“ erklärt (stille Hochzeit), SHALL er allein Re sein und wie ein Solist abgerechnet werden. Im Solo SHALL der Solist allein Re sein. In der Hochzeit SHALL der Gewinner des ersten der ersten drei Stiche, den nicht der Hochzeiter macht (Klärungsstich), sein Partner werden; macht der Hochzeiter die ersten drei Stiche selbst, SHALL er allein Re spielen und wie ein Solist abgerechnet werden.

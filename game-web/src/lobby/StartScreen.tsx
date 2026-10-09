@@ -3,6 +3,8 @@ import { PERSONAS, ROUND_CHOICES, personaName } from "shared";
 import type { NpcPersona } from "shared";
 import { SuitShape } from "../cards/Card";
 import { listOpenMatches, npcSeats, type MatchInfo } from "./api";
+import { RulesSheet } from "../rules/RulesSheet";
+import { VARIANTS } from "../rules/variants";
 import { SpielothekLink } from "./SpielothekLink";
 
 export type SeatChoice = "mensch" | NpcPersona;
@@ -11,6 +13,8 @@ export interface CreateOptions {
   seats: SeatChoice[]; // seats 2–4
   rounds: number;
   withNines: boolean;
+  secondDulleWins: boolean;
+  schmeissen: boolean;
 }
 
 interface Props {
@@ -36,6 +40,8 @@ export function StartScreen(props: Props) {
   const [seats, setSeats] = useState<SeatChoice[]>(["hilde", "knut", "professor"]);
   const [rounds, setRounds] = useState(8);
   const [withNines, setWithNines] = useState(true);
+  const [variants, setVariants] = useState({ secondDulleWins: false, schmeissen: false });
+  const [rulesOpen, setRulesOpen] = useState(false);
   const [matches, setMatches] = useState<MatchInfo[] | null>(null);
   const [listError, setListError] = useState(false);
 
@@ -69,6 +75,9 @@ export function StartScreen(props: Props) {
           </div>
           <h1 className="text-5xl font-extrabold leading-none tracking-tight text-chalk sm:text-7xl">Doppelkopf</h1>
           <p className="mt-2 text-lg text-chalk/70">Zu viert am Tisch – mit Freunden oder gegen den Computer.</p>
+          <button onClick={() => setRulesOpen(true)} className="mt-1 text-chalk/80 underline underline-offset-4 hover:text-chalk">
+            Spielregeln lesen
+          </button>
         </div>
         <div className="hidden gap-1 sm:flex" aria-hidden>
           {(["kreuz", "pik", "herz", "karo"] as const).map((s) => (
@@ -148,14 +157,33 @@ export function StartScreen(props: Props) {
               </button>
             ))}
           </div>
-          <label className="mt-4 flex items-center gap-2 text-chalk/85">
-            <input type="checkbox" checked={withNines} onChange={(e) => setWithNines(e.target.checked)} className="h-4 w-4 accent-re" />
-            Mit Neunen (48 Karten)
-          </label>
+          <fieldset className="mt-5 flex flex-col gap-2">
+            <legend className="mb-1 text-chalk/70">Regeln (Standard: DDV-Turnierregeln)</legend>
+            <label className="flex items-center gap-2 text-chalk/85">
+              <input type="checkbox" checked={withNines} onChange={(e) => setWithNines(e.target.checked)} className="h-4 w-4 accent-re" />
+              Mit Neunen (48 Karten)
+            </label>
+            {VARIANTS.map((v) => (
+              <label key={v.key} className="flex items-start gap-2 text-chalk/85" title={v.text}>
+                <input
+                  type="checkbox"
+                  checked={variants[v.key]}
+                  onChange={(e) => setVariants({ ...variants, [v.key]: e.target.checked })}
+                  className="mt-1 h-4 w-4 shrink-0 accent-re"
+                />
+                <span>
+                  {v.label} <span className="text-sm text-chalk/55">(Hausregel)</span>
+                </span>
+              </label>
+            ))}
+            <button onClick={() => setRulesOpen(true)} className="self-start text-sm text-chalk/60 underline underline-offset-2 hover:text-chalk">
+              Was bedeuten die Regeln?
+            </button>
+          </fieldset>
 
           <button
             disabled={busy || nameMissing}
-            onClick={() => props.onCreate({ seats, rounds, withNines })}
+            onClick={() => props.onCreate({ seats, rounds, withNines, ...variants })}
             className="mt-6 w-full rounded-xl bg-re py-3 text-lg font-extrabold text-wood-950 shadow-[0_3px_0_#9b7522] transition active:translate-y-0.5 active:shadow-none disabled:opacity-40"
           >
             {humans === 1 ? "Spiel starten" : `Tisch für ${humans} Menschen öffnen`}
@@ -185,6 +213,7 @@ export function StartScreen(props: Props) {
                       .join(", ")}
                     {" – "}
                     {m.setupData?.rounds ?? 8} Runden{m.setupData?.withNines === false ? ", ohne Neunen" : ""}
+                    {VARIANTS.filter((v) => m.setupData?.[v.key]).map((v) => `, ${v.label}`)}
                   </div>
                 </div>
                 <button
@@ -199,6 +228,7 @@ export function StartScreen(props: Props) {
           </ul>
         </section>
       </div>
+      {rulesOpen && <RulesSheet rules={null} onClose={() => setRulesOpen(false)} />}
     </main>
   );
 }

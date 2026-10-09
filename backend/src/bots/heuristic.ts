@@ -14,6 +14,8 @@ export interface PlayContext {
   tricks: Trick[];
   /** Parties as known to this player (null = unknown). */
   parties: (Party | null)[];
+  /** House rule: the second Herz-Zehn beats the first. */
+  secondDulleWins?: boolean;
 }
 
 const FULL_DECK = createDeck(true);
@@ -70,18 +72,19 @@ function highestOutstandingTrump(ctx: PlayContext): number {
 
 export function chooseCardHeuristic(ctx: PlayContext, rnd: () => number = Math.random): Card {
   const { gameType, trick, hand, seat, parties } = ctx;
+  const dulle2 = ctx.secondDulleWins ?? false;
   const legal = legalCards(hand, trick, gameType);
   if (legal.length === 1) return legal[0];
   const myParty = parties[seat];
 
   if (trick.length === 0) return chooseLead(ctx, legal, rnd);
 
-  const bestIdx = winningIndex(trick, gameType);
+  const bestIdx = winningIndex(trick, gameType, dulle2);
   const best = trick[bestIdx];
   const partnerWinning = myParty !== null && best.seat !== seat && parties[best.seat] === myParty;
   const last = trick.length === 3;
   const value = trickAugen(trick);
-  const winners = legal.filter((c) => winningIndex([...trick, { seat, card: c }], gameType) === trick.length);
+  const winners = legal.filter((c) => winningIndex([...trick, { seat, card: c }], gameType, dulle2) === trick.length);
 
   if (partnerWinning) {
     const bestPower = isTrump(best.card, gameType) ? power(best.card, gameType) : 0;

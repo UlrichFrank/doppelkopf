@@ -26,8 +26,13 @@ describe("Stichvergabe Normalspiel", () => {
     expect(trickWinner(trick("cD h10 sD dA"), "normal")).toBe(1);
   });
 
-  test("zweite Dulle schlägt die erste", () => {
-    expect(trickWinner(trick("h10 cD h10 dA"), "normal")).toBe(2);
+  test("zwei Dullen: die erste gewinnt (DDV)", () => {
+    expect(trickWinner(trick("h10 cD h10 dA"), "normal")).toBe(0);
+  });
+
+  test("Hausregel: zweite Dulle schlägt die erste", () => {
+    expect(trickWinner(trick("h10 cD h10 dA"), "normal", true)).toBe(2);
+    expect(trickWinner(trick("h10 h10 h9 hK"), "damen", true)).toBe(0);
   });
 
   test("gleiche Karten: die erste gewinnt", () => {

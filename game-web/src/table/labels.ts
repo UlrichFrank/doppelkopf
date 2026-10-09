@@ -5,6 +5,7 @@ export const RESERVATION_LABEL: Record<Reservation | "vorbehalt", string> = {
   gesund: "gesund",
   vorbehalt: "Vorbehalt",
   hochzeit: "Hochzeit",
+  schmeissen: "Schmeißen",
   damen: "Damensolo",
   buben: "Bubensolo",
   fleischlos: "Fleischloser",

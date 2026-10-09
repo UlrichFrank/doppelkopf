@@ -95,7 +95,13 @@ export default function App() {
       const npcSlots: NpcSlotConfig[] = opts.seats.flatMap((choice, i) =>
         choice === "mensch" ? [] : [{ seat: i + 1, persona: choice }],
       );
-      const matchID = await createMatch({ rounds: opts.rounds, withNines: opts.withNines, npcSlots });
+      const matchID = await createMatch({
+        rounds: opts.rounds,
+        withNines: opts.withNines,
+        secondDulleWins: opts.secondDulleWins,
+        schmeissen: opts.schmeissen,
+        npcSlots,
+      });
       const credentials = await joinMatch(matchID, "0", name.trim());
       setMatch(null);
       enter({ matchID, playerID: "0", credentials });

@@ -1,6 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import { possibleAnnouncements } from "../game/announcements";
-import { announce, declareReservation, initialState, pendingAction, playCard, setReady } from "../game/round";
+import {
+  allowedReservations,
+  announce,
+  declareReservation,
+  initialState,
+  pendingAction,
+  playCard,
+  setReady,
+} from "../game/round";
 import { legalCards } from "../game/rules";
 import type { DoppelkopfState, Reservation } from "../game/types";
 import { viewFor } from "../game/view";
@@ -58,6 +66,30 @@ describe("Vorbehalte", () => {
     reserve(G, ["gesund", "kreuz", "damen", "gesund"]);
     expect(G.round.gameType).toBe("kreuz");
     expect(G.round.soloist).toBe(1);
+  });
+
+  test("Schmeißen nur als Hausregel und mit fünf Neunen oder Königen", () => {
+    const G = stateWithHands([["c9", "c9", "s9", "s9", "h9"], ["cK", "cK", "sK", "sK"]]);
+    expect(allowedReservations(G.round.hands[0], G.options)).not.toContain("schmeissen");
+    expect(declareReservation(G, 0, "schmeissen", noShuffle)).not.toBeNull();
+    G.options.schmeissen = true;
+    expect(allowedReservations(G.round.hands[0], G.options)).toContain("schmeissen");
+    expect(allowedReservations(G.round.hands[1], G.options)).not.toContain("schmeissen");
+  });
+
+  test("Schmeißen: gleicher Geber gibt neu, Runde zählt nicht", () => {
+    const G = stateWithHands([["c9", "c9", "s9", "s9", "h9"]]);
+    G.options.schmeissen = true;
+    const thrownHand = G.round.hands[0];
+    expect(declareReservation(G, 0, "schmeissen", noShuffle)).toBeNull();
+    expect(G.stage).toBe("reservations");
+    expect(G.round.number).toBe(1);
+    expect(G.round.dealer).toBe(3);
+    expect(G.round.reservationTurn).toBe(0);
+    expect(G.round.thrown).toEqual({ seat: 0, hand: thrownHand });
+    expect(G.round.hands.map((h) => h.length)).toEqual([12, 12, 12, 12]);
+    // The thrown hand is public
+    expect(viewFor(G, 2).round.thrown?.hand).toHaveLength(12);
   });
 
   test("Hochzeit nur mit beiden Kreuz-Damen", () => {

@@ -63,8 +63,12 @@ export function power(card: Card, gameType: GameType): number {
   return TRUMP_SUIT_POWER[card.rank] ?? 0;
 }
 
-/** True when `card` played later beats `best` (the current winner of the trick). */
-function beats(card: Card, best: Card, leadSuit: EffectiveSuit, gameType: GameType): boolean {
+/**
+ * True when `card` played later beats `best` (the current winner of the trick).
+ * Of two equal cards the first one wins (DDV), unless the house rule
+ * `secondDulleWins` lets the second Herz-Zehn beat the first.
+ */
+function beats(card: Card, best: Card, leadSuit: EffectiveSuit, gameType: GameType, secondDulleWins: boolean): boolean {
   const cardSuit = effectiveSuit(card, gameType);
   const bestSuit = effectiveSuit(best, gameType);
   if (cardSuit === "trumpf" && bestSuit !== "trumpf") return true;
@@ -72,24 +76,23 @@ function beats(card: Card, best: Card, leadSuit: EffectiveSuit, gameType: GameTy
   if (cardSuit !== "trumpf" && cardSuit !== leadSuit) return false;
   const p = power(card, gameType);
   const b = power(best, gameType);
-  // Of two Dullen, the second wins
-  if (p === b) return cardSuit === "trumpf" && isDulle(card) && hasStandardTrumps(gameType);
+  if (p === b) return secondDulleWins && cardSuit === "trumpf" && isDulle(card) && hasStandardTrumps(gameType);
   return p > b;
 }
 
 /** Index (into `cards`) of the card that wins the trick. */
-export function winningIndex(cards: PlayedCard[], gameType: GameType): number {
+export function winningIndex(cards: PlayedCard[], gameType: GameType, secondDulleWins = false): number {
   if (cards.length === 0) return -1;
   const leadSuit = effectiveSuit(cards[0].card, gameType);
   let best = 0;
   for (let i = 1; i < cards.length; i++) {
-    if (beats(cards[i].card, cards[best].card, leadSuit, gameType)) best = i;
+    if (beats(cards[i].card, cards[best].card, leadSuit, gameType, secondDulleWins)) best = i;
   }
   return best;
 }
 
-export function trickWinner(cards: PlayedCard[], gameType: GameType): Seat {
-  return cards[winningIndex(cards, gameType)].seat;
+export function trickWinner(cards: PlayedCard[], gameType: GameType, secondDulleWins = false): Seat {
+  return cards[winningIndex(cards, gameType, secondDulleWins)].seat;
 }
 
 /** Cards of `hand` that may be played onto `trickCards` (Bedienpflicht). */
