@@ -34,7 +34,7 @@ Restart=always
 RestartSec=2
 # Matches are written on SIGTERM; give it a moment before SIGKILL
 TimeoutStopSec=10
-MemoryMax=400M
+MemoryMax=250M
 
 # Hardening (Bun's JIT needs writable+executable memory: no MemoryDenyWriteExecute)
 NoNewPrivileges=true
