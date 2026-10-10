@@ -1,3 +1,5 @@
+import { loadSpielname, saveSpielname } from "./spielname";
+
 /** Seat and credentials of the match this device plays in (survives reloads). */
 export interface Session {
   matchID: string;
@@ -37,5 +39,9 @@ export function loadSession(): Session | null {
 }
 
 export const saveSession = (s: Session | null) => write(SESSION_KEY, s ? JSON.stringify(s) : null);
-export const loadName = () => read(NAME_KEY) ?? "";
-export const saveName = (name: string) => write(NAME_KEY, name);
+/** The name shared by all games; the old per-game key still counts until the first save. */
+export const loadName = () => loadSpielname() || (read(NAME_KEY) ?? "");
+export function saveName(name: string): void {
+  saveSpielname(name);
+  write(NAME_KEY, null);
+}
