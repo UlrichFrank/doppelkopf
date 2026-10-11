@@ -46,8 +46,20 @@ export class Leaderboard {
         if (name !== "__proto__") players[name] = entry;
       }
       return { players, counted: raw.counted ?? [] };
-    } catch {
+    } catch (err) {
+      this.quarantine(err);
       return { players: Object.create(null), counted: [] };
+    }
+  }
+
+  /** An unreadable file must not be overwritten by the next record: set it aside. */
+  private quarantine(err: unknown): void {
+    try {
+      const aside = `${this.file}.corrupt-${Date.now()}`;
+      renameSync(this.file, aside);
+      console.warn(`[Leaderboard] ${this.file} unreadable (${err}); moved to ${aside}`);
+    } catch {
+      // nothing to set aside
     }
   }
 

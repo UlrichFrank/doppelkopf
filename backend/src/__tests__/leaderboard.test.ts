@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { mkdtempSync } from "fs";
+import { mkdtempSync, readdirSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { Leaderboard } from "../leaderboard";
@@ -43,4 +43,14 @@ test("table is capped at 100 players and keeps this match's players", () => {
   expect(names).toContain("P109");
   lb.record("long", [{ name: "x".repeat(50), score: 1 }, { name: "Anna", score: 0 }]);
   expect(lb.list().some((e) => e.name.length > 20)).toBe(false);
+});
+
+test("an unreadable file is set aside instead of being overwritten", () => {
+  const dir = mkdtempSync(join(tmpdir(), "lb-"));
+  const file = join(dir, "lb.json");
+  writeFileSync(file, "{ broken");
+  const lb = new Leaderboard(file);
+  lb.record("m1", [{ name: "Anna", score: 2 }, { name: "Knut", score: 1 }]);
+  expect(readdirSync(dir).some((f) => f.startsWith("lb.json.corrupt-"))).toBe(true);
+  expect(lb.list().length).toBe(2);
 });
