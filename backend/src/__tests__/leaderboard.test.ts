@@ -28,3 +28,19 @@ test("player-chosen names cannot touch the prototype", () => {
   expect(({} as Record<string, unknown>).games).toBeUndefined();
   expect(lb.list().map((e) => e.name)).toEqual(["constructor"]);
 });
+
+test("table is capped at 100 players and keeps this match's players", () => {
+  const lb = fresh();
+  for (let i = 0; i < 110; i++) {
+    lb.record(`m${i}`, [
+      { name: `P${i}`, score: 10 },
+      { name: "Anna", score: 5 },
+    ]);
+  }
+  const names = lb.list().map((e) => e.name);
+  expect(names.length).toBe(100);
+  expect(names).toContain("Anna");
+  expect(names).toContain("P109");
+  lb.record("long", [{ name: "x".repeat(50), score: 1 }, { name: "Anna", score: 0 }]);
+  expect(lb.list().some((e) => e.name.length > 20)).toBe(false);
+});
