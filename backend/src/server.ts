@@ -3,6 +3,7 @@ import { join } from "path";
 import { Doppelkopf, GAME_NAME } from "shared";
 import { BotRunner } from "./bot-runner";
 import { FileStorage } from "./fileStorage";
+import { Leaderboard } from "./leaderboard";
 import { patchWsTextFrames } from "./wsTextFrames";
 import { serveStatic } from "./staticFiles";
 import { assets } from "./embedded";
@@ -35,6 +36,17 @@ patchWsTextFrames();
 // Persisted so running matches survive a backend restart
 const storage = new FileStorage(MATCHES_FILE);
 
+const leaderboard = new Leaderboard(join(NPC_DATA_DIR, "leaderboard.json"));
+storage.onGameover = (matchID, metadata) => {
+  const scores = (metadata.gameover as { scores?: number[] } | undefined)?.scores;
+  if (!Array.isArray(scores)) return;
+  const rows = scores
+    .map((score, i) => ({ name: metadata.players[i]?.name ?? "", score }))
+    .filter((r) => r.name !== "")
+    .sort((a, b) => b.score - a.score);
+  leaderboard.record(matchID, rows);
+};
+
 const server = Server({
   games: [Doppelkopf],
   db: storage,
@@ -43,6 +55,14 @@ const server = Server({
 
 // Game page embedded into the binary (empty in development — Vite serves it).
 // Registered before run() adds the lobby router, so it is checked first.
+server.app.use(async (ctx: any, next: () => Promise<unknown>) => {
+  if (ctx.path === "/leaderboard" && ctx.method === "GET") {
+    ctx.set("Access-Control-Allow-Origin", "*");
+    ctx.body = leaderboard.list();
+    return;
+  }
+  await next();
+});
 server.app.use(serveStatic(assets) as never);
 
 // server.run() only passes the port to listen(); add the bind address

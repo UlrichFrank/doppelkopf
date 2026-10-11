@@ -54,7 +54,8 @@ export function GameClient({ session, onLeave, onPause }: Props) {
         G: state.G as DoppelkopfState,
         gameover: state.ctx.gameover !== undefined,
         names: [0, 1, 2, 3].map((i) => players.find((p) => p.id === i)?.name ?? `Platz ${i + 1}`),
-        connected: [0, 1, 2, 3].map((i) => players.find((p) => p.id === i)?.isConnected !== false),
+        // After the game the NPC clients are shut down: nobody is "offline" then
+        connected: [0, 1, 2, 3].map((i) => state.ctx.gameover !== undefined || players.find((p) => p.id === i)?.isConnected !== false),
         isConnected: state.isConnected,
       });
     });
