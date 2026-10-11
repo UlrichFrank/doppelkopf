@@ -26,6 +26,9 @@ export class FileStorage extends Sync {
   private log = new Map<string, LogEntry[]>();
   private writeTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /** Called with every metadata write of a finished match (may fire repeatedly). */
+  onGameover: ((matchID: string, metadata: Server.MatchData) => void) | null = null;
+
   constructor(private readonly file: string) {
     super();
     this.load();
@@ -40,6 +43,7 @@ export class FileStorage extends Sync {
 
   setMetadata(matchID: string, metadata: Server.MatchData): void {
     this.metadata.set(matchID, metadata);
+    if (metadata.gameover !== undefined) this.onGameover?.(matchID, metadata);
     this.scheduleWrite();
   }
 

@@ -6,6 +6,7 @@ import { listOpenMatches, npcSeats, type MatchInfo } from "./api";
 import { RulesSheet } from "../rules/RulesSheet";
 import { VARIANTS } from "../rules/variants";
 import { SpielothekLink } from "./SpielothekLink";
+import { Leaderboard } from "./Leaderboard";
 
 export type SeatChoice = "mensch" | NpcPersona;
 
@@ -228,6 +229,7 @@ export function StartScreen(props: Props) {
           </ul>
         </section>
       </div>
+      <Leaderboard />
       {rulesOpen && <RulesSheet rules={null} onClose={() => setRulesOpen(false)} />}
     </main>
   );
