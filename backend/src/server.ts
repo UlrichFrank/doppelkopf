@@ -63,6 +63,30 @@ server.app.use(async (ctx: any, next: () => Promise<unknown>) => {
   }
   await next();
 });
+const bots = new BotRunner(SELF_URL, join(NPC_DATA_DIR, "npc-credentials.json"));
+
+// Spielothek admins end abandoned matches. Traefik sets X-Spielothek-Rolle via
+// forwardAuth (a client-sent one is dropped); the Spielothek calls 127.0.0.1 directly.
+server.app.use(async (ctx: any, next: () => Promise<unknown>) => {
+  const m = /^\/admin\/partien\/([^/]+)$/.exec(ctx.path);
+  if (!m || ctx.method !== "DELETE") {
+    await next();
+    return;
+  }
+  if (ctx.get("x-spielothek-rolle") !== "admin") {
+    ctx.status = 403;
+    return;
+  }
+  const matchID = decodeURIComponent(m[1]);
+  if (!storage.fetch(matchID, { metadata: true }).metadata) {
+    ctx.status = 404;
+    return;
+  }
+  bots.finishMatch(matchID);
+  storage.wipe(matchID);
+  console.log(`Partie ${matchID} von der Spielothek beendet`);
+  ctx.status = 204;
+});
 server.app.use(serveStatic(assets) as never);
 
 // server.run() only passes the port to listen(); add the bind address
@@ -71,8 +95,6 @@ if (HOST) {
   (server.app as unknown as { listen: (...args: unknown[]) => unknown }).listen = (port: unknown, ...rest: unknown[]) =>
     listen(port, HOST, ...rest);
 }
-
-const bots = new BotRunner(SELF_URL, join(NPC_DATA_DIR, "npc-credentials.json"));
 
 server.run(PORT, () => {
   console.log(`Doppelkopf server running on ${HOST ?? "*"}:${PORT}`);

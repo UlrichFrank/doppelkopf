@@ -262,7 +262,8 @@ export class BotRunner {
     }
   }
 
-  private finishMatch(matchID: string): void {
+  /** Stops the NPCs of a match for good (game over, or ended by an admin). */
+  finishMatch(matchID: string): void {
     for (const [key, bot] of this.bots) {
       if (bot.matchID !== matchID) continue;
       this.stopBot(bot);
